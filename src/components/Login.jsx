@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-// import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../context/AuthContext";
 import { useNavigate, useLocation } from "react-router-dom";
 
 const Login = () => {
@@ -8,52 +8,51 @@ const Login = () => {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  // const { login, isAuthenticated } = useAuth();
+  const { login, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Redirect if already authenticated
-  // useEffect(() => {
-  //   if (isAuthenticated) {
-  //     navigate("/dashboard");
-  //   }
-  // }, [isAuthenticated, navigate]);
+  // Fix: Uncomment and use this line
+  const from = location.state?.from?.pathname || "/dashboard";
 
-  // const from = location.state?.from?.pathname || "/dashboard";
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/dashboard", { replace: true });
+    }
+  }, [isAuthenticated, navigate]);
 
-  const handleSubmit = async (e) => {}
-  // const handleSubmit = async (e) => {
-  //   e.preventDefault();
-  //   setError("");
-  //   setIsLoading(true);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+    setIsLoading(true);
 
-  //   // Basic validation
-  //   if (!email || !password) {
-  //     setError("Please fill in all fields");
-  //     setIsLoading(false);
-  //     return;
-  //   }
+    // Basic validation
+    if (!email || !password) {
+      setError("Please fill in all fields");
+      setIsLoading(false);
+      return;
+    }
 
-  //   if (!/\S+@\S+\.\S+/.test(email)) {
-  //     setError("Please enter a valid email address");
-  //     setIsLoading(false);
-  //     return;
-  //   }
+    if (!/\S+@\S+\.\S+/.test(email)) {
+      setError("Please enter a valid email address");
+      setIsLoading(false);
+      return;
+    }
 
-  //   try {
-  //     const result = await login(email, password);
+    try {
+      const result = await login(email, password);
 
-  //     if (result.success) {
-  //       navigate(from, { replace: true });
-  //     } else {
-  //       setError(result.message);
-  //     }
-  //   } catch (err) {
-  //     setError("An unexpected error occurred. Please try again.");
-  //   } finally {
-  //     setIsLoading(false);
-  //   }
-  // };
+      if (result.success) {
+        navigate(from, { replace: true }); // Now 'from' is defined
+      } else {
+        setError(result.message);
+      }
+    } catch (err) {
+      setError("An unexpected error occurred. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div className="login-container" style={styles.container}>
@@ -61,7 +60,8 @@ const Login = () => {
         <div className="card-header text-center mb-4">
           <h2 style={styles.title}>
             <i className="fas fa-chart-pie me-2"></i>
-            LDAP Authentication <br />Horiba India
+            LDAP Authentication <br />
+            Horiba India
           </h2>
           <p className="text-white">Sign in to your account</p>
         </div>
@@ -78,7 +78,7 @@ const Login = () => {
 
         <form onSubmit={handleSubmit}>
           <div className="mb-3">
-            <label htmlFor="email" className="form-label">
+            <label htmlFor="email" className="form-label text-white">
               Email Address
             </label>
             <div className="input-group">
@@ -98,7 +98,7 @@ const Login = () => {
           </div>
 
           <div className="mb-4">
-            <label htmlFor="password" className="form-label">
+            <label htmlFor="password" className="form-label text-white">
               Password
             </label>
             <div className="input-group">
@@ -140,9 +140,7 @@ const Login = () => {
               )}
             </button>
           </div>
-
         </form>
-
       </div>
     </div>
   );
@@ -157,17 +155,17 @@ const styles = {
     justifyContent: "center",
     padding: "20px",
   },
-card: {
-  background: "rgba(0, 0, 0, 0.23)",
-  borderRadius: "16px",
-  boxShadow: "rgb(0 0 0 / 45%) 20px 13px 30px 4px",
-  backdropFilter: "blur(5.5px)",
-  WebkitBackdropFilter: "blur(5.5px)",
-  border: "1px solid rgba(0, 0, 0, 0.1)",
-  padding: "40px 50px",
-  color: "#fff",
-  minWidth:"40vw"
-},
+  card: {
+    background: "rgba(0, 0, 0, 0.23)",
+    borderRadius: "16px",
+    boxShadow: "rgb(0 0 0 / 45%) 20px 13px 30px 4px",
+    backdropFilter: "blur(5.5px)",
+    WebkitBackdropFilter: "blur(5.5px)",
+    border: "1px solid rgba(0, 0, 0, 0.1)",
+    padding: "40px 50px",
+    color: "#fff",
+    minWidth: "40vw",
+  },
   title: {
     color: "#fff",
     fontWeight: "700",
