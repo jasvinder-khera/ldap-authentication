@@ -1,4 +1,5 @@
 import React, { createContext, useState, useContext, useEffect } from "react";
+import { login as apiLogin } from "../services/api";
 
 const AuthContext = createContext();
 
@@ -17,10 +18,10 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     // Check if user is logged in on app start
-    const token = localStorage.getItem("token");
+    const access = localStorage.getItem("accessToken");
     const userData = localStorage.getItem("user");
 
-    if (token && userData) {
+    if (access && userData) {
       setUser(JSON.parse(userData));
       setIsAuthenticated(true);
     }
@@ -28,40 +29,27 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const login = async (email, password) => {
-    try {
-      // For demo purposes - replace with actual API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+  try {
+    const response = await apiLogin({ email, password }); // Real API call
+    const { access, refresh, user } = response.data;
 
-      if (email === "admin@example.com" && password === "password") {
-        const userData = {
-          id: 1,
-          name: "John Doe",
-          email: "admin@example.com",
-          avatar: "https://randomuser.me/api/portraits/men/41.jpg",
-        };
+    localStorage.setItem("accessToken", access);
+    localStorage.setItem("refreshToken", refresh);
+    localStorage.setItem("user", JSON.stringify(user));
+    setUser(user);
+    setIsAuthenticated(true);
 
-        const token = "mock-jwt-token-12345";
-
-        localStorage.setItem("token", token);
-        localStorage.setItem("user", JSON.stringify(userData));
-        setUser(userData);
-        setIsAuthenticated(true);
-
-        return { success: true, user: userData, token };
-      } else {
-        return { 
-          success: false, message: "Invalid email or password" };
-      }
-    } catch (error) {
-      return {
-        success: false,
-        message: error.response?.data?.message || "Login failed",
-      };
-    }
-  };
+    return { success: true, user, access, refresh };
+  } catch (error) {
+    return {
+      success: false,
+      message: error.response?.data?.message || "Login failed",
+    };
+  }
+};
 
   const logout = () => {
-    localStorage.removeItem("token");
+    localStorage.removeItem("accessToken");
     localStorage.removeItem("user");
     setUser(null);
     setIsAuthenticated(false);

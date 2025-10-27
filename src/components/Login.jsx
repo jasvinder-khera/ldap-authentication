@@ -47,7 +47,7 @@ const Login = () => {
         navigate(from, { replace: true }); // Now 'from' is defined
       } else {
         setError(result.message);
-        toast.error("Login Failed")
+        toast.error(result.message)
       }
     } catch (err) {
       setError("An unexpected error occurred. Please try again.");
