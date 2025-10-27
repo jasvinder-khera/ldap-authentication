@@ -49,7 +49,8 @@ export const AuthProvider = ({ children }) => {
 
         return { success: true, user: userData, token };
       } else {
-        return { success: false, message: "Invalid email or password" };
+        return { 
+          success: false, message: "Invalid email or password" };
       }
     } catch (error) {
       return {

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate, useLocation } from "react-router-dom";
+import {toast} from 'react-toastify';
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -46,9 +47,11 @@ const Login = () => {
         navigate(from, { replace: true }); // Now 'from' is defined
       } else {
         setError(result.message);
+        toast.error("Login Failed")
       }
     } catch (err) {
       setError("An unexpected error occurred. Please try again.");
+      toast.error("An unexpected error occurred. Please try again.");
     } finally {
       setIsLoading(false);
     }
