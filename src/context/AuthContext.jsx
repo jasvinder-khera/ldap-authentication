@@ -19,48 +19,65 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     // Check if user is logged in on app start
     const access = localStorage.getItem("accessToken");
-    const userData = localStorage.getItem("user");
+    const userDetails = localStorage.getItem("userDetails");
 
-    if (access && userData) {
-      setUser(JSON.parse(userData));
-      setIsAuthenticated(true);
+    if (access && userDetails) {
+      try {
+        const parsedUser = JSON.parse(userDetails);
+        setUser(parsedUser);
+        setIsAuthenticated(true);
+      } catch (error) {
+        console.error("Error parsing user data:", error);
+        // Clear invalid data
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("userDetails");
+      }
     }
     setLoading(false);
   }, []);
 
   const login = async (email, password) => {
-  try {
-    const response = await apiLogin({ email, password }); // Real API call
-    const { access, refresh, user } = response.data;
+    try {
+      const response = await apiLogin({ email, password });
+      const { access, refresh } = response.data;
+      console.log("Result", response.data.user[0]);
 
-    localStorage.setItem("accessToken", access);
-    localStorage.setItem("refreshToken", refresh);
-    localStorage.setItem("user", JSON.stringify(user));
-    setUser(user);
-    setIsAuthenticated(true);
+      const userData = response.data.user[0];
 
-    return { success: true, user, access, refresh };
-  } catch (error) {
-    return {
-      success: false,
-      message: error.response?.data?.message || "Login failed",
-    };
-  }
-};
+      localStorage.setItem("accessToken", access);
+      localStorage.setItem("refreshToken", refresh);
+      localStorage.setItem("userDetails", JSON.stringify(userData));
+      setUser(userData);
+      setIsAuthenticated(true);
+
+      return {
+        success: true,
+        user: userData,
+        access,
+        refresh,
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: error.response?.data?.message || "Login failed",
+      };
+    }
+  };
 
   const logout = () => {
     localStorage.removeItem("accessToken");
-    localStorage.removeItem("user");
-    setUser(null);
+    localStorage.removeItem("refreshToken"); // Added missing refreshToken removal
+    localStorage.removeItem("userDetails");
+    setUser(null); // Added missing setUser null
     setIsAuthenticated(false);
   };
 
   const value = {
-    user,
+    user, // Added user back to context
     loading,
     login,
     logout,
-    isAuthenticated, // Remove the function call, use the state
+    isAuthenticated,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

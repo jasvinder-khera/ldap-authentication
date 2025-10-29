@@ -1,6 +1,11 @@
 import React from "react";
+import { useAuth } from "../context/AuthContext";
 
 const Sidebar = ({ isActive, toggleSidebar }) => {
+  const { logout } = useAuth();
+   const handleLogout = () => {
+     logout();
+   };
   return (
     <div className={`sidebar ${isActive ? "active" : ""}`}>
       <div className="logo">
@@ -35,9 +40,9 @@ const Sidebar = ({ isActive, toggleSidebar }) => {
           </a>
         </li>
         <li className="nav-item">
-          <a className="nav-link" href="#">
-            <i className="fas fa-question-circle"></i> Help
-          </a>
+          <button className="nav-link w-100 text-start" onClick={handleLogout}>
+            <i className="fas fa-sign-out-alt me-2"></i> Sign out
+          </button>
         </li>
       </ul>
     </div>

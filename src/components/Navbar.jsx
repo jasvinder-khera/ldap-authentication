@@ -1,6 +1,8 @@
 import React from "react";
+import { useAuth } from "../context/AuthContext";
 
-const Navbar = ({ toggleSidebar, user, onLogout }) => {
+const Navbar = ({ toggleSidebar, onLogout }) => {
+  const { user } = useAuth();
   return (
     <nav className="navbar navbar-expand-lg">
       <div className="container-fluid">
@@ -19,13 +21,12 @@ const Navbar = ({ toggleSidebar, user, onLogout }) => {
             >
               <img
                 src={
-                  user?.avatar ||
                   "https://www.pngfind.com/pngs/m/610-6104451_image-placeholder-png-user-profile-placeholder-image-png.png"
                 }
                 alt="User"
                 className="user-avatar me-2"
               />
-              <span>{user?.name || "User"}</span>
+              <span>{user.username || "User"}</span>
             </a>
             <ul
               className="dropdown-menu dropdown-menu-end"

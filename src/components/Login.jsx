@@ -44,6 +44,7 @@ const Login = () => {
       const result = await login(email, password);
 
       if (result.success) {
+        toast.success("Logged in Successfully");
         navigate(from, { replace: true }); // Now 'from' is defined
       } else {
         setError(result.message);
